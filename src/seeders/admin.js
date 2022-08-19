@@ -6,36 +6,32 @@ const bcrypt = require("bcrypt");
 seedAdmin = async () => {
   const admin = await User.findOne({ role: "admin" });
   if (!admin) {
-    await User.create(
-      {
-        username: "admin",
-        email: "admin@website.com",
-        password: "admin1234",
-        role: "admin",
-      },
-      (err, user) => {
-        if (err) {
-          console.log(err);
-        } else {
-          hashedPassword = bcrypt.hash(user.password, 12, (err, hash) => {
-            if (err) {
-              console.log(err);
-            } else {
-              user.password = hash;
-              user.save((err, user) => {
-                if (err) {
-                  console.log(err);
-                } else {
-                  return `Admin account created: ${user.username}`;
-                }
-              });
-            }
-          });
-        }
-      }
-    );
-  }
-  else return "admin account already exists";
+    await User.create({
+      username: "admin",
+      email: "admin@website.com",
+      password: "admin1234",
+      role: "admin",
+    })
+      .then((user) => {
+        hashedPassword = bcrypt.hash(user.password, 12, (err, hash) => {
+          if (err) {
+            console.log(err);
+          } else {
+            user.password = hash;
+            user.save((err, user) => {
+              if (err) {
+                console.log(err);
+              } else {
+                console.log(`Admin account created: ${user.username}`);
+              }
+            });
+          }
+        });
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  } else console.log("admin account already exists");
 };
 
 module.exports = seedAdmin;
