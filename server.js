@@ -1,27 +1,32 @@
 const express = require("express");
-const routes = require("./src/routes/authRoutes");
-const connect = require("./db/database");
+const authRoutes = require("./src/routes/authRoutes");
+const managerRoutes = require("./src/routes/managerRoutes");
+const userRoutes = require("./src/routes/userRoutes");
+const adminRoutes = require("./src/routes/adminRoutes");
+const connect = require("./database/setup");
 const seedAdmin = require("./src/seeders/admin");
-require("dotenv").config();
+const { PORT } = require("./src/config");
 
 app = express();
 
 app.use(express.json());
 
-app.use(routes);
+app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api", managerRoutes);
+app.use("/api", userRoutes);
 
 const start = async () => {
   await connect();
-  console.log(await seedAdmin())
+  await seedAdmin();
   try {
-    app.listen(process.env.PORT);
-    console.log(`Server started on port ${process.env.PORT}`);
+    app.listen(PORT);
+    console.log(`Server started on port ${PORT}`);
   } catch (err) {
     console.log(err.message);
     console.log("Server failed to start");
     process.exit(1);
   }
 };
-
 
 start();
